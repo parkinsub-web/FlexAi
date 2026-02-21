@@ -19,6 +19,7 @@
       <a href="#features">서비스</a>
       <a href="#packages">패키지100</a>
       <a href="#pricing">비용</a>
+      <a href="#inquiry-board">고객문의</a>
       <a href="#contact">문의</a>
     </nav>
   </header>
@@ -254,6 +255,47 @@
 
       <button class="submit">문의하기</button>
     </form>
+  </section>
+
+  <section id="inquiry-board" class="section inquiry-board">
+    <div class="section-title">
+      <h2>고객문의 게시판</h2>
+      <p>문의사항을 남겨주시면 빠르게 확인 후 답변드리겠습니다.</p>
+    </div>
+    <div class="inquiry-wrap">
+      <form id="inquiryForm" class="inquiry-form">
+        <label>
+          이름
+          <input type="text" name="name" maxlength="60" placeholder="홍길동" required />
+        </label>
+        <label>
+          이메일
+          <input type="email" name="email" maxlength="120" placeholder="you@company.com" />
+        </label>
+        <label>
+          연락처
+          <input type="text" name="phone" maxlength="30" placeholder="010-1234-5678" />
+        </label>
+        <label>
+          제목
+          <input type="text" name="title" maxlength="150" placeholder="문의 제목을 입력해주세요." required />
+        </label>
+        <label class="full">
+          문의 내용
+          <textarea name="message" maxlength="2000" placeholder="문의 내용을 입력해주세요." required></textarea>
+        </label>
+        <button type="submit" class="submit">문의 등록</button>
+        <p id="inquiryFeedback" class="feedback" aria-live="polite"></p>
+      </form>
+
+      <div class="inquiry-list-panel">
+        <div class="inquiry-list-head">
+          <h3>최근 문의</h3>
+          <button id="refreshInquiryList" type="button" class="mini ghost">새로고침</button>
+        </div>
+        <ul id="inquiryList" class="inquiry-list"></ul>
+      </div>
+    </div>
   </section>
 
   <footer class="footer">

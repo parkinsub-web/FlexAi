@@ -503,8 +503,151 @@ button {
   cursor: pointer;
 }
 
+.inquiry-board {
+  background: #f7f9ff;
+}
+
+.inquiry-wrap {
+  max-width: 980px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.inquiry-form,
+.inquiry-list-panel {
+  background: #fff;
+  border: 1px solid #dfe4f0;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 12px 26px rgba(20, 31, 80, 0.08);
+}
+
+.inquiry-form {
+  display: grid;
+  gap: 12px;
+}
+
+.inquiry-form label {
+  display: grid;
+  gap: 8px;
+  font-size: 13px;
+  color: #111;
+}
+
+.inquiry-form input,
+.inquiry-form textarea {
+  border: 1px solid #d9dce8;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.inquiry-form textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.inquiry-form .full {
+  grid-column: 1 / -1;
+}
+
+.inquiry-form .submit {
+  width: 100%;
+  border-radius: 10px;
+  background: #5e77ff;
+  color: #fff;
+  padding: 12px 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.inquiry-list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.inquiry-list-head h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.inquiry-list-head .mini.ghost {
+  border: 1px solid #c4cbe1;
+  border-radius: 8px;
+  background: #fff;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.inquiry-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+  max-height: 560px;
+  overflow: auto;
+}
+
+.inquiry-item {
+  border: 1px solid #e4e8f5;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.inquiry-item .meta {
+  display: grid;
+  gap: 4px;
+}
+
+.inquiry-item .meta strong {
+  font-size: 14px;
+  color: #111;
+}
+
+.inquiry-item .meta span {
+  color: #76809a;
+  font-size: 12px;
+}
+
+.inquiry-item p {
+  margin: 8px 0 0;
+  color: #3d4558;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.inquiry-list .empty {
+  border: 1px dashed #c9d1e7;
+  border-radius: 10px;
+  padding: 16px;
+  font-size: 13px;
+  color: #667189;
+  text-align: center;
+}
+
+.feedback {
+  margin: 0;
+  font-size: 13px;
+  color: #3355d6;
+}
+
+.feedback.error {
+  color: #cf2548;
+}
+
 @media (max-width: 760px) {
   .contact-form .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .inquiry-wrap {
     grid-template-columns: 1fr;
   }
 }

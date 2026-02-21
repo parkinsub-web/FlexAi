@@ -39,3 +39,116 @@ window.addEventListener('scroll', () => {
   const y = window.scrollY * 0.2;
   blob.style.transform = `translateY(${y}px)`;
 });
+
+const inquiryForm = document.getElementById('inquiryForm');
+const inquiryList = document.getElementById('inquiryList');
+const inquiryFeedback = document.getElementById('inquiryFeedback');
+const refreshInquiryListBtn = document.getElementById('refreshInquiryList');
+
+const escapeHtml = (value = '') =>
+  value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+
+const formatDate = (isoValue) => {
+  if (!isoValue) return '';
+  const parsed = new Date(isoValue);
+  if (Number.isNaN(parsed.getTime())) return '';
+  return new Intl.DateTimeFormat('ko-KR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(parsed);
+};
+
+const renderInquiryList = (items = []) => {
+  if (!inquiryList) return;
+  if (!items.length) {
+    inquiryList.innerHTML = '<li class="empty">등록된 문의가 없습니다.</li>';
+    return;
+  }
+
+  inquiryList.innerHTML = items
+    .map(
+      (item) => `
+      <li class="inquiry-item">
+        <div class="meta">
+          <strong>${escapeHtml(item.title || '')}</strong>
+          <span>${escapeHtml(item.name || '익명')} · ${formatDate(item.createdAt)}</span>
+        </div>
+        <p>${escapeHtml(item.message || '')}</p>
+      </li>`
+    )
+    .join('');
+};
+
+const setInquiryFeedback = (text, isError = false) => {
+  if (!inquiryFeedback) return;
+  inquiryFeedback.textContent = text;
+  inquiryFeedback.classList.toggle('error', isError);
+};
+
+const loadInquiries = async () => {
+  if (!inquiryList) return;
+  inquiryList.innerHTML = '<li class="empty">문의 목록을 불러오는 중입니다...</li>';
+
+  try {
+    const response = await fetch('/api/inquiries?limit=20');
+    if (!response.ok) throw new Error('문의 목록 조회 실패');
+    const data = await response.json();
+    renderInquiryList(Array.isArray(data.items) ? data.items : []);
+  } catch (error) {
+    renderInquiryList([]);
+    setInquiryFeedback('문의 목록을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.', true);
+  }
+};
+
+if (inquiryForm) {
+  inquiryForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    setInquiryFeedback('문의를 등록하는 중입니다...');
+
+    const formData = new FormData(inquiryForm);
+    const payload = {
+      name: (formData.get('name') || '').toString().trim(),
+      email: (formData.get('email') || '').toString().trim(),
+      phone: (formData.get('phone') || '').toString().trim(),
+      title: (formData.get('title') || '').toString().trim(),
+      message: (formData.get('message') || '').toString().trim(),
+    };
+
+    try {
+      const response = await fetch('/api/inquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+      if (!response.ok || !result.ok) {
+        throw new Error(result?.error || '문의 등록 실패');
+      }
+
+      inquiryForm.reset();
+      setInquiryFeedback('문의가 정상 등록되었습니다. 빠르게 확인 후 답변드리겠습니다.');
+      await loadInquiries();
+    } catch (error) {
+      setInquiryFeedback(error.message || '문의 등록에 실패했습니다.', true);
+    }
+  });
+}
+
+if (refreshInquiryListBtn) {
+  refreshInquiryListBtn.addEventListener('click', () => {
+    loadInquiries();
+  });
+}
+
+if (inquiryList) {
+  loadInquiries();
+}
