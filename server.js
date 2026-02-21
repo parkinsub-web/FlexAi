@@ -1,6 +1,7 @@
 const path = require('path');
 const express = require('express');
-require('dotenv').config();
+// PM2의 cwd 설정과 무관하게 항상 server.js 위치의 .env를 로드
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const app = express();
 const PORT = Number(process.env.PORT || 8080);
