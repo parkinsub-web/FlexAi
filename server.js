@@ -40,7 +40,7 @@ if (isTruthy(process.env.DB_SSL)) {
   poolConfig.ssl = ssl;
 }
 
-const requiredEnv = ['root', 'Pis82825@pis', 'my_app'];
+const requiredEnv = ['DB_USER', 'DB_PASSWORD', 'DB_NAME'];
 const missingEnv = requiredEnv.filter((key) => !process.env[key]);
 if (missingEnv.length > 0) {
   console.error(`Missing required env vars: ${missingEnv.join(', ')}`);
