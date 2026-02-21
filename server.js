@@ -5,6 +5,13 @@ require('dotenv').config();
 
 const app = express();
 const PORT = Number(process.env.PORT || 8080);
+const cloudSqlConnectionName =
+  process.env.INSTANCE_CONNECTION_NAME || process.env.CLOUD_SQL_CONNECTION_NAME;
+
+const isTruthy = (value) => {
+  if (value == null) return false;
+  return ['1', 'true', 'yes', 'on'].includes(String(value).trim().toLowerCase());
+};
 
 const poolConfig = {
   user: process.env.DB_USER,
@@ -16,12 +23,21 @@ const poolConfig = {
   charset: 'utf8mb4',
 };
 
-if (process.env.INSTANCE_CONNECTION_NAME) {
+if (cloudSqlConnectionName) {
   const socketBase = process.env.DB_SOCKET_PATH || '/cloudsql';
-  poolConfig.socketPath = path.posix.join(socketBase, process.env.INSTANCE_CONNECTION_NAME);
+  poolConfig.socketPath = path.posix.join(socketBase, cloudSqlConnectionName);
 } else {
   poolConfig.host = process.env.DB_HOST || '127.0.0.1';
   poolConfig.port = Number(process.env.DB_PORT || 3306);
+}
+
+if (isTruthy(process.env.DB_SSL)) {
+  const ssl = {};
+  const sslCa = process.env.DB_SSL_CA;
+  if (sslCa) {
+    ssl.ca = sslCa.replace(/\\n/g, '\n');
+  }
+  poolConfig.ssl = ssl;
 }
 
 const requiredEnv = ['DB_USER', 'DB_PASSWORD', 'DB_NAME'];
@@ -117,6 +133,7 @@ app.get('*', (req, res) => {
 
 const bootstrap = async () => {
   try {
+    await pool.query('SELECT 1');
     await ensureTable();
     app.listen(PORT, () => {
       console.log(`Server started on http://localhost:${PORT}`);
