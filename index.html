@@ -212,48 +212,49 @@
       <h2>상담 문의</h2>
       <p>마케팅 고민, 소가 해결해드리겠습니다!<br>아래 정보를 남겨주시면 맞춤형 상담과 견적을 안내해드리겠습니다.</p>
     </div>
-    <form class="contact-form">
+    <form id="contactForm" class="contact-form">
       <div class="grid">
         <label>
           성함 (회사명)
-          <input type="text" placeholder="성함을 입력하세요." />
+          <input type="text" name="name" placeholder="성함을 입력하세요." required />
         </label>
         <label>
           이메일 주소
-          <input type="email" placeholder="이메일 주소를 입력하세요." />
+          <input type="email" name="email" placeholder="이메일 주소를 입력하세요." />
         </label>
         <label>
           연락처
-          <input type="text" placeholder="010-1234-5678" />
+          <input type="text" name="phone" placeholder="010-1234-5678" />
         </label>
         <label>
           직함
-          <input type="text" placeholder="프로젝트 매니저" />
+          <input type="text" name="jobTitle" placeholder="프로젝트 매니저" />
         </label>
       </div>
 
       <fieldset>
         <legend>관심 있는 마케팅 분야를 선택해주세요.</legend>
-        <label><input type="checkbox" /> 콘텐츠 기획 및 제작</label>
-        <label><input type="checkbox" /> 브랜딩 / 브랜드 전략</label>
-        <label><input type="checkbox" /> 퍼포먼스 광고 (메타·구글 등)</label>
-        <label><input type="checkbox" /> 인플루언서 마케팅 (협찬, 공구 등)</label>
-        <label><input type="checkbox" /> SNS 운영 (인스타그램, 유튜브, 블로그 등)</label>
+        <label><input type="checkbox" name="interest" value="콘텐츠 기획 및 제작" /> 콘텐츠 기획 및 제작</label>
+        <label><input type="checkbox" name="interest" value="브랜딩 / 브랜드 전략" /> 브랜딩 / 브랜드 전략</label>
+        <label><input type="checkbox" name="interest" value="퍼포먼스 광고 (메타·구글 등)" /> 퍼포먼스 광고 (메타·구글 등)</label>
+        <label><input type="checkbox" name="interest" value="인플루언서 마케팅 (협찬, 공구 등)" /> 인플루언서 마케팅 (협찬, 공구 등)</label>
+        <label><input type="checkbox" name="interest" value="SNS 운영 (인스타그램, 유튜브, 블로그 등)" /> SNS 운영 (인스타그램, 유튜브, 블로그 등)</label>
       </fieldset>
 
       <fieldset>
         <legend>현재 마케팅에서 가장 어려운 부분은 무엇인가요?</legend>
-        <label><input type="checkbox" /> 비용</label>
-        <label><input type="checkbox" /> 운영 인력</label>
-        <label><input type="checkbox" /> 성과 측정</label>
+        <label><input type="checkbox" name="difficulty" value="비용" /> 비용</label>
+        <label><input type="checkbox" name="difficulty" value="운영 인력" /> 운영 인력</label>
+        <label><input type="checkbox" name="difficulty" value="성과 측정" /> 성과 측정</label>
       </fieldset>
 
       <label class="full">
         문의사항
-        <textarea placeholder="문의 사항을 입력해주세요."></textarea>
+        <textarea name="message" placeholder="문의 사항을 입력해주세요." required></textarea>
       </label>
 
-      <button class="submit">문의하기</button>
+      <button type="submit" class="submit">문의하기</button>
+      <p id="contactFeedback" class="feedback" aria-live="polite"></p>
     </form>
   </section>
 

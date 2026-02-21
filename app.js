@@ -152,3 +152,68 @@ if (refreshInquiryListBtn) {
 if (inquiryList) {
   loadInquiries();
 }
+
+/* ─── 상담 문의 (contactForm) ─── */
+const contactForm = document.getElementById('contactForm');
+const contactFeedback = document.getElementById('contactFeedback');
+
+const setContactFeedback = (text, isError = false) => {
+  if (!contactFeedback) return;
+  contactFeedback.textContent = text;
+  contactFeedback.classList.toggle('error', isError);
+};
+
+if (contactForm) {
+  contactForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    setContactFeedback('문의를 등록하는 중입니다...');
+
+    const fd = new FormData(contactForm);
+    const name = (fd.get('name') || '').toString().trim();
+    const email = (fd.get('email') || '').toString().trim();
+    const phone = (fd.get('phone') || '').toString().trim();
+    const jobTitle = (fd.get('jobTitle') || '').toString().trim();
+
+    // 체크박스 수집
+    const interests = fd.getAll('interest');
+    const difficulties = fd.getAll('difficulty');
+    const messageText = (fd.get('message') || '').toString().trim();
+
+    // title: 관심 분야를 제목으로 구성
+    const title = interests.length
+      ? `[상담 문의] ${interests.join(', ')}`
+      : '[상담 문의]';
+
+    // message: 직함 + 어려운 부분 + 문의사항 통합
+    const parts = [];
+    if (jobTitle) parts.push(`직함: ${jobTitle}`);
+    if (difficulties.length) parts.push(`어려운 부분: ${difficulties.join(', ')}`);
+    if (messageText) parts.push(`문의사항:\n${messageText}`);
+    const message = parts.join('\n\n');
+
+    if (!name || !message) {
+      setContactFeedback('성함과 문의사항을 입력해주세요.', true);
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/inquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, title, message }),
+      });
+
+      const result = await response.json();
+      if (!response.ok || !result.ok) {
+        throw new Error(result?.error || '문의 등록 실패');
+      }
+
+      contactForm.reset();
+      setContactFeedback('상담 문의가 정상 등록되었습니다. 빠르게 확인 후 답변드리겠습니다.');
+      // 고객문의 게시판 목록도 갱신
+      if (inquiryList) await loadInquiries();
+    } catch (error) {
+      setContactFeedback(error.message || '문의 등록에 실패했습니다.', true);
+    }
+  });
+}
