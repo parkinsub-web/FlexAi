@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+
+# Fill a default commit message when the message body is empty.
+set -eu
+
+msg_file="${1:-}"
+[ -n "$msg_file" ] || exit 0
+[ -f "$msg_file" ] || exit 0
+
+# Remove comments and blank lines, then check if anything remains.
+if ! grep -v '^[[:space:]]*#' "$msg_file" | grep -q '[^[:space:]]'; then
+  printf '%s\n' "chore: update" > "$msg_file"
+fi
