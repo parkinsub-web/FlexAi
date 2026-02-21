@@ -42,7 +42,7 @@ node -e "
       connectTimeout: 5000,
     });
     const [rows] = await conn.query('SELECT 1 AS ok');
-    console.log('  MySQL 연결 성공:', rows[0]);
+    console.log('  MySQL 연결 성공 ✅', rows[0]);
     await conn.end();
   })().catch(err => {
     console.error('  MySQL 연결 실패:', err.message);
@@ -51,29 +51,32 @@ node -e "
   });
 "
 
-# 3. PM2 설치 확인 (없으면 자동 설치)
+# 3. PM2 설치 및 PATH 설정
 echo ""
 echo "[3/6] PM2 확인..."
 if ! command -v pm2 &>/dev/null; then
   echo "   PM2 미설치 → 전역 설치 중..."
   npm install -g pm2
-  # PATH에 npm global bin 추가
-  export PATH="$(npm bin -g 2>/dev/null || npm root -g | sed 's|/node_modules||'):$PATH"
 fi
-echo "   PM2 준비됨 ✅ ($(pm2 --version))"
+
+# npm 글로벌 bin 경로를 확실하게 PATH에 추가
+NPM_GLOBAL_BIN="$(npm bin -g 2>/dev/null || dirname "$(npm root -g)")/bin"
+export PATH="${NPM_GLOBAL_BIN}:${PATH}"
+
+# pm2 절대경로 확보
+PM2_BIN="$(command -v pm2 || echo "${NPM_GLOBAL_BIN}/pm2")"
+echo "   PM2 준비됨 ✅ (v$("${PM2_BIN}" --version))"
 
 # 4. PM2로 앱 시작/재시작
 echo ""
 echo "[4/6] PM2 프로세스 시작..."
-if pm2 describe flexai-site &>/dev/null; then
-  pm2 reload "${DEPLOY_DIR}/ecosystem.config.js" --update-env
+if "${PM2_BIN}" describe flexai-site &>/dev/null; then
+  "${PM2_BIN}" reload "${DEPLOY_DIR}/ecosystem.config.js" --update-env
 else
-  pm2 start "${DEPLOY_DIR}/ecosystem.config.js"
+  "${PM2_BIN}" start "${DEPLOY_DIR}/ecosystem.config.js"
 fi
-pm2 save
-
-# PM2 시스템 재부팅 시 자동시작 등록
-pm2 startup systemd -u "$(whoami)" --hp "$HOME" 2>/dev/null || true
+"${PM2_BIN}" save
+"${PM2_BIN}" startup systemd -u "$(whoami)" --hp "$HOME" 2>/dev/null || true
 
 # 5. Nginx 설치 확인 및 설정 적용
 echo ""
@@ -89,9 +92,13 @@ sudo nginx -t
 sudo systemctl enable --now nginx
 sudo systemctl reload nginx
 
-# 6. 완료
+# 6. 완료 및 상태 확인
 echo ""
-echo "[6/6] 완료!"
+echo "[6/6] 배포 완료 — 상태 확인..."
+sleep 2
+"${PM2_BIN}" list
+echo ""
+echo "서버 로그 확인: ${PM2_BIN} logs flexai-site --lines 20"
 echo ""
 echo "========================================="
 echo " 배포 완료!"

@@ -180,24 +180,27 @@ const bootstrap = async () => {
   const hasDbEnv = process.env.DB_USER && process.env.DB_PASSWORD && process.env.DB_NAME;
 
   if (hasDbEnv) {
+    console.log(`[DB] 연결 시도: ${process.env.DB_USER}@${process.env.DB_HOST || '127.0.0.1'}:${process.env.DB_PORT || 3306} / ${process.env.DB_NAME}`);
     try {
       pool = buildPoolConfig();
       await pool.query('SELECT 1');
       await ensureTable();
       console.log('✅ MySQL 연결 성공');
     } catch (error) {
-      console.warn(`⚠️  MySQL 연결 실패 (${error.code || error.message})`);
+      console.error(`❌ MySQL 연결 실패: [${error.code}] ${error.message}`);
+      console.error(`   host=${process.env.DB_HOST}, user=${process.env.DB_USER}, db=${process.env.DB_NAME}`);
       console.warn('   → In-memory 모드로 전환합니다. (데이터는 서버 재시작 시 초기화됩니다)');
       pool = null;
       useMemoryStore = true;
     }
   } else {
     console.warn('⚠️  DB 환경변수 미설정 → In-memory 모드로 실행합니다.');
+    console.warn(`   DB_USER=${process.env.DB_USER}, DB_NAME=${process.env.DB_NAME}`);
     useMemoryStore = true;
   }
 
   app.listen(PORT, () => {
-    const mode = useMemoryStore ? '[In-memory 로컬 모드]' : '[MySQL 연결됨]';
+    const mode = useMemoryStore ? '[⚠️  In-memory 로컬 모드 — DB 미연결]' : '[✅ MySQL 연결됨]';
     console.log(`🚀 서버 시작: http://localhost:${PORT}  ${mode}`);
   });
 };
