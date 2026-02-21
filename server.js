@@ -30,6 +30,11 @@ const memQuery = {
     memoryStore.items.push(item);
     return id;
   },
+  delete(id) {
+    const initialLength = memoryStore.items.length;
+    memoryStore.items = memoryStore.items.filter(item => item.id !== id);
+    return memoryStore.items.length < initialLength;
+  }
 };
 
 // ─── MySQL 설정 ───
@@ -141,10 +146,10 @@ app.get('/api/inquiries', async (req, res) => {
 
 // ─── API: 문의 등록 ───
 app.post('/api/inquiries', async (req, res) => {
-  const name    = String(req.body?.name    || '').trim().slice(0, 60);
-  const email   = String(req.body?.email   || '').trim().slice(0, 120);
-  const phone   = String(req.body?.phone   || '').trim().slice(0, 30);
-  const title   = String(req.body?.title   || '').trim().slice(0, 150);
+  const name = String(req.body?.name || '').trim().slice(0, 60);
+  const email = String(req.body?.email || '').trim().slice(0, 120);
+  const phone = String(req.body?.phone || '').trim().slice(0, 30);
+  const title = String(req.body?.title || '').trim().slice(0, 150);
   const message = String(req.body?.message || '').trim().slice(0, 2000);
 
   if (!name || !title || !message) {
@@ -168,6 +173,33 @@ app.post('/api/inquiries', async (req, res) => {
   } catch (error) {
     console.error('Failed to create inquiry:', error);
     return res.status(500).json({ ok: false, error: '문의 등록 중 오류가 발생했습니다.' });
+  }
+});
+
+// ─── API: 문의 삭제 ───
+app.delete('/api/inquiries/:id', async (req, res) => {
+  const id = Number.parseInt(req.params.id, 10);
+  if (Number.isNaN(id)) {
+    return res.status(400).json({ ok: false, error: '유효하지 않은 ID입니다.' });
+  }
+
+  try {
+    if (useMemoryStore) {
+      const deleted = memQuery.delete(id);
+      if (!deleted) {
+        return res.status(404).json({ ok: false, error: '해당 문의를 찾을 수 없습니다.' });
+      }
+      return res.json({ ok: true });
+    }
+
+    const [result] = await pool.execute(`DELETE FROM inquiries WHERE id = ?`, [id]);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ ok: false, error: '해당 문의를 찾을 수 없습니다.' });
+    }
+    res.json({ ok: true });
+  } catch (error) {
+    console.error('Failed to delete inquiry:', error);
+    res.status(500).json({ ok: false, error: '문의 삭제 중 오류가 발생했습니다.' });
   }
 });
 
