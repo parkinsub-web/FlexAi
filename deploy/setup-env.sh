@@ -20,8 +20,8 @@ fi
 cat > "${ENV_FILE}" << 'EOF'
 PORT=8080
 
-# MySQL 접속 정보
-DB_USER=root
+# MySQL 접속 정보 (setup-mysql.sh 로 생성된 전용 계정)
+DB_USER=flexai_user
 DB_PASSWORD=Pis82825@pis
 DB_NAME=my_app
 DB_HOST=127.0.0.1
@@ -32,7 +32,7 @@ chmod 600 "${ENV_FILE}"
 
 echo ""
 echo "✅ ${ENV_FILE} 생성 완료"
-echo "   DB_USER=root / DB_NAME=my_app / DB_HOST=127.0.0.1"
+echo "   DB_USER=flexai_user / DB_NAME=my_app / DB_HOST=127.0.0.1"
 echo ""
 echo "다음 단계: 배포를 실행하세요."
 echo "  bash deploy/deploy.sh"
