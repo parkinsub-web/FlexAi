@@ -3,7 +3,7 @@
 # 사용법: bash deploy/setup-env.sh
 set -euo pipefail
 
-APP_DIR="/home/flexai/app"
+APP_DIR="/var/www/html"
 ENV_FILE="${APP_DIR}/.env"
 
 echo "=== FlexAI .env 생성 ==="

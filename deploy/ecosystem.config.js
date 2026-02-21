@@ -6,7 +6,7 @@ module.exports = {
     {
       name: 'flexai-site',
       script: 'server.js',
-      cwd: '/home/flexai/app',
+      cwd: '/var/www/html',
       instances: 1,
       autorestart: true,
       max_memory_restart: '256M',

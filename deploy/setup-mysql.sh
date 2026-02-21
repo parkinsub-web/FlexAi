@@ -4,7 +4,6 @@
 set -euo pipefail
 
 DB_NAME="${DB_NAME:-my_app}"
-DB_USER="${DB_USER:-root}"
 DB_ROOT_PASS="Pis82825@pis"
 
 echo "=== FlexAI MySQL 초기 설정 ==="
@@ -22,14 +21,12 @@ fi
 echo "[2/5] MySQL 서비스 활성화..."
 sudo systemctl enable --now mysql
 
-# 3. root 계정 비밀번호 인증 방식으로 변경
-#    Ubuntu MySQL은 기본으로 auth_socket을 사용하므로
-#    TCP(비밀번호) 접속을 위해 mysql_native_password로 교체
-echo "[3/5] root 계정 인증 방식 변경 (auth_socket → mysql_native_password)..."
+# 3. root 계정 비밀번호 설정
+#    MySQL 8.4+에서는 mysql_native_password 플러그인이 제거됨.
+#    → IDENTIFIED BY 만 사용 (기본값 caching_sha2_password 자동 적용)
+echo "[3/5] root 계정 비밀번호 설정..."
 sudo mysql -e "
-  ALTER USER 'root'@'localhost'
-    IDENTIFIED WITH mysql_native_password
-    BY '${DB_ROOT_PASS}';
+  ALTER USER 'root'@'localhost' IDENTIFIED BY '${DB_ROOT_PASS}';
   FLUSH PRIVILEGES;
 "
 
@@ -49,4 +46,4 @@ echo "  DB   : ${DB_NAME}"
 echo "  User : root"
 echo ""
 echo "다음 단계: setup-env.sh 를 실행해 .env 파일을 생성하세요."
-echo "  sudo bash deploy/setup-env.sh"
+echo "  bash deploy/setup-env.sh"

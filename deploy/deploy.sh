@@ -3,7 +3,7 @@
 # 사용법: bash deploy/deploy.sh
 set -euo pipefail
 
-APP_DIR="/home/flexai/app"
+APP_DIR="/var/www/html"
 DEPLOY_DIR="${APP_DIR}/deploy"
 
 echo "========================================="
